@@ -1,0 +1,27 @@
+## Part 2 - RaceDay REST API
+
+ASP.NET Core Web API (.NET 10) using Entity Framework Core (Code-First) on SQL Server, session-based authentication, Swagger and xUnit tests.
+
+### The two roles
+- **Organiser** - creates and manages events and categories, sees enrolments for their own events, and records results.
+- **Participant** - browses events, enrols in a category, and views their own enrolments and results.
+
+### Setup and run
+1. Install the .NET 10 SDK, Visual Studio and SQL Server LocalDB.
+2. Open `Part2/Part2.sln`. The connection string is in `RaceDay.Api/appsettings.json`.
+3. In a terminal inside `Part2/RaceDay.Api`, run `dotnet ef database update` to create the database.
+4. Press F5. Swagger opens at `https://localhost:7100/swagger`.
+5. Register with `POST /api/auth/register/organiser` or `/participant`, then log in with `POST /api/auth/login`. Swagger sends the session cookie automatically.
+6. Run the tests with `dotnet test` inside the `Part2` folder.
+
+### Differences from the Part 1 plan
+- Events now store `DistanceKm` and `EventType` (Run, Walk or Cycle), as Part 2 requires.
+- Login starts a server-side session (cookie) instead of returning a token, and `POST /api/auth/logout` was added.
+- Delete endpoints return 409 when enrolments exist, and recording a result returns 409 if one already exists.
+
+### CI/CD
+![CI passing](ci-success.png)
+
+### Video walkthrough
+[https://youtu.be/tBNTW2Tnv6g]
+
