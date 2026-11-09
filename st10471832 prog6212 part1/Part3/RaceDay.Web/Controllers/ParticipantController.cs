@@ -47,6 +47,51 @@ public class ParticipantController : Controller
         return RedirectToAction(nameof(MyEvents));
     }
 
+    [HttpGet]
+    public async Task<IActionResult> Profile()
+    {
+        var result = await _api.GetAsync<ProfileDto>("api/users/me");
+
+        if (!result.Success || result.Data == null)
+        {
+            TempData["Error"] = result.Error ?? "Could not load your profile.";
+            return RedirectToAction("Index", "Home");
+        }
+
+        var p = result.Data;
+        return View(new ProfileViewModel
+        {
+            FullName = p.FullName,
+            Email = p.Email,
+            Phone = p.Phone,
+            DateOfBirth = p.DateOfBirth,
+            ProfilePictureUrl = p.ProfilePictureUrl
+        });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Profile(ProfileViewModel model)
+    {
+        if (!ModelState.IsValid)
+            return View(model);
+
+        var result = await _api.PutAsync<object>("api/users/me", new
+        {
+            fullName = model.FullName,
+            phone = model.Phone,
+            dateOfBirth = model.DateOfBirth?.ToString("yyyy-MM-dd")
+        });
+
+        if (!result.Success)
+        {
+            ModelState.AddModelError(string.Empty, result.Error ?? "Could not update your profile.");
+            return View(model);
+        }
+
+        HttpContext.Session.SetString("FullName", model.FullName);
+        TempData["Success"] = "Profile updated.";
+        return RedirectToAction(nameof(Profile));
+    }
     public async Task<IActionResult> MyResults()
     {
         var result = await _api.GetAsync<List<ResultDto>>("api/participants/me/results");
