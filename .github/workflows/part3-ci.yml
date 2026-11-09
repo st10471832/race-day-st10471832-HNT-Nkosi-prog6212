@@ -1,0 +1,28 @@
+name: Part 3 CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-mvc:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "st10471832 prog6212 part1/Part3"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore Part3.sln
+
+      - name: Build MVC project
+        run: dotnet build Part3.sln --no-restore --configuration Release
