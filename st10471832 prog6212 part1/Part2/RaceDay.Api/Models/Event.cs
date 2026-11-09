@@ -2,6 +2,7 @@
 
 public class Event
 {
+    public string? BannerImageUrl { get; set; }
     public int EventID { get; set; }
     public int OrganiserID { get; set; }
     public string EventName { get; set; } = string.Empty;

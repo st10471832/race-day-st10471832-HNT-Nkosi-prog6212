@@ -2,13 +2,13 @@
 
 public record ErrorResponse(string Message);
 
-public record ProfileResponse(int UserId, string Role, string FullName, string Email, string? Phone, DateOnly? DateOfBirth);
+public record ProfileResponse(int UserId, string Role, string FullName, string Email, string? Phone, DateOnly? DateOfBirth, string? ProfilePictureUrl = null);
 
 public record LoginResponse(int UserId, string Role, string FullName, string Message);
 
 public record EventResponse(
     int EventID, int OrganiserID, string OrganiserName, string EventName, string? Description,
-    DateOnly EventDate, string Location, decimal DistanceKm, string EventType);
+    DateOnly EventDate, string Location, decimal DistanceKm, string EventType, string? BannerImageUrl = null);
 
 public record CategoryResponse(
     int CategoryID, int EventID, string CategoryName, decimal DistanceKm, int MaxParticipants, decimal Price);
