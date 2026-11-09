@@ -12,6 +12,10 @@
 {
     <div class="alert alert-success">@TempData["Success"]</div>
 }
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
 @if (ViewBag.Error != null)
 {
     <div class="alert alert-danger">@ViewBag.Error</div>
@@ -24,7 +28,7 @@
 else
 {
     <div class="card shadow-sm">
-        <table class="table mb-0">
+        <table class="table mb-0 align-middle">
             <thead>
                 <tr><th>Event</th><th>Date</th><th>Location</th><th>Type</th><th>Distance</th><th></th></tr>
             </thead>
@@ -40,6 +44,12 @@ else
                         <td class="text-end">
                             <a asp-controller="Categories" asp-action="Index" asp-route-eventId="@e.EventID" class="btn btn-outline-secondary btn-sm">Categories</a>
                             <a asp-controller="Enrolments" asp-action="Index" asp-route-eventId="@e.EventID" class="btn btn-outline-secondary btn-sm">Enrolments &amp; results</a>
+                            <a asp-action="EditEvent" asp-route-id="@e.EventID" class="btn btn-outline-primary btn-sm">Edit</a>
+                            <form asp-action="DeleteEvent" method="post" class="d-inline"
+                                  onsubmit="return confirm('Delete this event? This cannot be undone.');">
+                                <input type="hidden" name="id" value="@e.EventID" />
+                                <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                            </form>
                         </td>
                     </tr>
                 }

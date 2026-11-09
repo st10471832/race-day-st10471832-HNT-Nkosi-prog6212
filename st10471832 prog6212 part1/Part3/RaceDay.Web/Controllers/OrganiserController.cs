@@ -25,7 +25,7 @@ public class OrganiserController : Controller
         base.OnActionExecuting(context);
     }
 
-    public async Task<IActionResult> Events()
+    private async Task<List<EventDto>> LoadMyEvents()
     {
         var userId = HttpContext.Session.GetInt32("UserId");
         var result = await _api.GetAsync<List<EventDto>>("api/events");
@@ -33,12 +33,36 @@ public class OrganiserController : Controller
         if (!result.Success)
             ViewBag.Error = result.Error;
 
-        var mine = (result.Data ?? new List<EventDto>())
+        return (result.Data ?? new List<EventDto>())
             .Where(e => e.OrganiserID == userId)
             .OrderBy(e => e.EventDate)
             .ToList();
+    }
 
-        return View(mine);
+    public async Task<IActionResult> Dashboard()
+    {
+        var model = new DashboardViewModel();
+
+        foreach (var ev in await LoadMyEvents())
+        {
+            var count = 0;
+            var cats = await _api.GetAsync<List<CategoryDto>>($"api/events/{ev.EventID}/categories");
+
+            foreach (var c in cats.Data ?? new List<CategoryDto>())
+            {
+                var enrolments = await _api.GetAsync<List<EnrolmentDto>>($"api/categories/{c.CategoryID}/enrolments");
+                count += enrolments.Data?.Count ?? 0;
+            }
+
+            model.Events.Add(new EventStat { Event = ev, Enrolments = count });
+        }
+
+        return View(model);
+    }
+
+    public async Task<IActionResult> Events()
+    {
+        return View(await LoadMyEvents());
     }
 
     [HttpGet]
@@ -50,15 +74,7 @@ public class OrganiserController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
-        var result = await _api.PostAsync<EventDto>("api/events", new
-        {
-            eventName = model.EventName,
-            description = model.Description,
-            eventDate = model.EventDate.ToString("yyyy-MM-dd"),
-            location = model.Location,
-            distanceKm = model.DistanceKm,
-            eventType = model.EventType
-        });
+        var result = await _api.PostAsync<EventDto>("api/events", BuildBody(model));
 
         if (!result.Success)
         {
@@ -69,4 +85,69 @@ public class OrganiserController : Controller
         TempData["Success"] = "Event created.";
         return RedirectToAction(nameof(Events));
     }
+
+    [HttpGet]
+    public async Task<IActionResult> EditEvent(int id)
+    {
+        var result = await _api.GetAsync<EventDto>($"api/events/{id}");
+
+        if (!result.Success || result.Data == null)
+        {
+            TempData["Error"] = result.Error ?? "Event not found.";
+            return RedirectToAction(nameof(Events));
+        }
+
+        var e = result.Data;
+        return View(new EventFormViewModel
+        {
+            EventID = e.EventID,
+            EventName = e.EventName,
+            Description = e.Description,
+            EventDate = e.EventDate,
+            Location = e.Location,
+            DistanceKm = e.DistanceKm,
+            EventType = e.EventType
+        });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> EditEvent(EventFormViewModel model)
+    {
+        if (!ModelState.IsValid)
+            return View(model);
+
+        var result = await _api.PutAsync<EventDto>($"api/events/{model.EventID}", BuildBody(model));
+
+        if (!result.Success)
+        {
+            ModelState.AddModelError(string.Empty, result.Error ?? "Could not update the event.");
+            return View(model);
+        }
+
+        TempData["Success"] = "Event updated.";
+        return RedirectToAction(nameof(Events));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> DeleteEvent(int id)
+    {
+        var result = await _api.DeleteAsync($"api/events/{id}");
+
+        if (!result.Success)
+            TempData["Error"] = result.Error;
+        else
+            TempData["Success"] = "Event deleted.";
+
+        return RedirectToAction(nameof(Events));
+    }
+
+    private static object BuildBody(EventFormViewModel model) => new
+    {
+        eventName = model.EventName,
+        description = model.Description,
+        eventDate = model.EventDate.ToString("yyyy-MM-dd"),
+        location = model.Location,
+        distanceKm = model.DistanceKm,
+        eventType = model.EventType
+    };
 }

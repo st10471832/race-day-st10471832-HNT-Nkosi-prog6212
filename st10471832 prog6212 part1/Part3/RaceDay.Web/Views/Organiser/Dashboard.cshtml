@@ -1,0 +1,69 @@
+﻿@model RaceDay.Web.Models.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h2 class="mb-3">Organiser Dashboard</h2>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm text-center p-3">
+            <div class="display-5 fw-bold">@Model.Events.Count</div>
+            <div class="text-muted">Events created</div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm text-center p-3">
+            <div class="display-5 fw-bold">@Model.TotalEnrolments</div>
+            <div class="text-muted">Total enrolments</div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm text-center p-3">
+            <div class="display-5 fw-bold">@Model.UpcomingCount</div>
+            <div class="text-muted">Upcoming events</div>
+        </div>
+    </div>
+</div>
+
+@if (!Model.Events.Any())
+{
+    <div class="alert alert-info">
+        You have no events yet. <a asp-action="CreateEvent">Create your first event</a>.
+    </div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <table class="table mb-0">
+            <thead>
+                <tr><th>Event</th><th>Date</th><th>Enrolments</th><th></th></tr>
+            </thead>
+            <tbody>
+                @foreach (var s in Model.Events)
+                {
+                    var upcoming = s.Event.EventDate >= DateOnly.FromDateTime(DateTime.Today);
+                    <tr>
+                        <td>@s.Event.EventName</td>
+                        <td>
+                            @s.Event.EventDate.ToString("dd MMM yyyy")
+                            @if (upcoming)
+                            {
+                                <span class="badge badge-confirmed ms-1">Upcoming</span>
+                            }
+                        </td>
+                        <td>@s.Enrolments</td>
+                        <td class="text-end">
+                            <a asp-controller="Enrolments" asp-action="Index" asp-route-eventId="@s.Event.EventID" class="btn btn-outline-secondary btn-sm">View enrolments</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
