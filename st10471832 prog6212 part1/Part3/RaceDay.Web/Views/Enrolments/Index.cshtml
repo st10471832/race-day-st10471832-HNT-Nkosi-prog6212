@@ -1,0 +1,69 @@
+﻿@model List<RaceDay.Web.Models.EnrolmentDto>
+@{
+    var ev = (RaceDay.Web.Models.EventDto)ViewBag.Event;
+    var results = (Dictionary<int, RaceDay.Web.Models.ResultDto>)ViewBag.Results;
+    ViewData["Title"] = "Enrolments";
+}
+
+<h2>Enrolments for @ev.EventName</h2>
+<p class="text-muted">@ev.EventDate.ToString("dd MMM yyyy") · @ev.Location</p>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Nobody has enrolled in this event yet.</div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <table class="table mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th>Participant</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Result (time, position, outcome)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var e in Model)
+                {
+                    var badge = e.Status == "Confirmed" ? "badge-confirmed" : e.Status == "Pending" ? "badge-pending" : "bg-secondary";
+                    results.TryGetValue(e.EnrolmentID, out var res);
+                    <tr>
+                        <td>@e.ParticipantName</td>
+                        <td>@e.CategoryName</td>
+                        <td><span class="badge @badge">@e.Status</span></td>
+                        <td>
+                            <form asp-action="SaveResult" method="post" class="d-flex gap-2">
+                                <input type="hidden" name="enrolmentId" value="@e.EnrolmentID" />
+                                <input type="hidden" name="eventId" value="@ev.EventID" />
+                                <input name="finishTime" class="form-control form-control-sm" style="width:110px" placeholder="01:25:30"
+                                       value="@(res?.FinishTime?.ToString(@"hh\:mm\:ss"))" />
+                                <input name="position" type="number" min="1" class="form-control form-control-sm" style="width:80px" placeholder="Pos"
+                                       value="@res?.Position" />
+                                <select name="status" class="form-select form-select-sm" style="width:130px">
+                                    <option value="Finished" selected="@(res?.Status == "Finished")">Finished</option>
+                                    <option value="DNF" selected="@(res?.Status == "DNF")">DNF</option>
+                                    <option value="DNS" selected="@(res?.Status == "DNS")">DNS</option>
+                                    <option value="Disqualified" selected="@(res?.Status == "Disqualified")">Disqualified</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<a asp-controller="Organiser" asp-action="Events" class="btn btn-link mt-3">&larr; Back to my events</a>

@@ -37,7 +37,10 @@ else
                         <td>@e.Location</td>
                         <td>@e.EventType</td>
                         <td>@e.DistanceKm km</td>
-                        <td class="text-end"><a asp-controller="Categories" asp-action="Index" asp-route-eventId="@e.EventID" class="btn btn-outline-secondary btn-sm">Categories</a></td>
+                        <td class="text-end">
+                            <a asp-controller="Categories" asp-action="Index" asp-route-eventId="@e.EventID" class="btn btn-outline-secondary btn-sm">Categories</a>
+                            <a asp-controller="Enrolments" asp-action="Index" asp-route-eventId="@e.EventID" class="btn btn-outline-secondary btn-sm">Enrolments &amp; results</a>
+                        </td>
                     </tr>
                 }
             </tbody>
