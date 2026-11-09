@@ -1,0 +1,38 @@
+﻿@model List<RaceDay.Web.Models.ResultDto>
+@{
+    ViewData["Title"] = "My Results";
+}
+
+<h2 class="mb-3">My Results</h2>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No results yet. They appear here after an organiser records them.</div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <table class="table mb-0">
+            <thead>
+                <tr><th>Event</th><th>Category</th><th>Finish time</th><th>Position</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model)
+                {
+                    <tr>
+                        <td>@r.EventName</td>
+                        <td>@r.CategoryName</td>
+                        <td>@(r.FinishTime.HasValue ? r.FinishTime.Value.ToString(@"hh\:mm\:ss") : "-")</td>
+                        <td>@(r.Position.HasValue ? r.Position.Value.ToString() : "-")</td>
+                        <td>@r.Status</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
