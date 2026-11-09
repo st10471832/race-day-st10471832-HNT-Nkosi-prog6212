@@ -1,0 +1,71 @@
+﻿@model List<RaceDay.Web.Models.CategoryDto>
+@{
+    var ev = (RaceDay.Web.Models.EventDto)ViewBag.Event;
+    var role = Context.Session.GetString("Role");
+    ViewData["Title"] = ev.EventName;
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+<div class="card shadow-sm mb-4">
+    @if (!string.IsNullOrEmpty(ev.BannerImageUrl))
+    {
+        <img src="@ev.BannerImageUrl" class="card-img-top" alt="@ev.EventName" style="max-height:260px;object-fit:cover;" />
+    }
+    <div class="card-body p-4">
+        <span class="badge bg-dark mb-2">@ev.EventType</span>
+        <h2>@ev.EventName</h2>
+        <p class="text-muted">Organised by @ev.OrganiserName</p>
+        <p>@ev.Description</p>
+        <p class="mb-1"> @ev.EventDate.ToString("dddd, dd MMMM yyyy")</p>
+        <p class="mb-1"> @ev.Location</p>
+        <p class="mb-0"> @ev.DistanceKm km</p>
+    </div>
+</div>
+
+<h4>Categories</h4>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">This event has no categories yet.</div>
+}
+else
+{
+    <div class="row">
+        @foreach (var c in Model)
+        {
+            <div class="col-md-4 mb-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5>@c.CategoryName</h5>
+                        <p class="mb-1">🏁 @c.DistanceKm km</p>
+                        <p class="mb-1">👥 Up to @c.MaxParticipants participants</p>
+                        <p class="mb-3">💰 R @c.Price.ToString("0.00")</p>
+
+                        @if (role == "Participant")
+                        {
+                            <form asp-action="Enrol" method="post">
+                                <input type="hidden" name="categoryId" value="@c.CategoryID" />
+                                <input type="hidden" name="eventId" value="@ev.EventID" />
+                                <button type="submit" class="btn btn-primary btn-sm">Enrol</button>
+                            </form>
+                        }
+                        else if (role == null)
+                        {
+                            <a asp-controller="Account" asp-action="Login" class="btn btn-outline-secondary btn-sm">Log in to enrol</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<a asp-controller="Home" asp-action="Index" class="btn btn-link mt-3">&larr; Back to events</a>
