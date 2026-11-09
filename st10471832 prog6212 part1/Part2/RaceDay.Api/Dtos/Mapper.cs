@@ -6,9 +6,8 @@ namespace RaceDay.Api.Dtos;
 public static class Mapper
 {
     public static EventResponse ToResponse(this Event e) =>
-        new(e.EventID, e.OrganiserID, e.Organiser.FullName, e.EventName, e.Description,
-            e.EventDate, e.Location, e.DistanceKm, e.EventType);
-
+             new(e.EventID, e.OrganiserID, e.Organiser.FullName, e.EventName, e.Description,
+            e.EventDate, e.Location, e.DistanceKm, e.EventType, e.BannerImageUrl);
     public static CategoryResponse ToResponse(this Category c) =>
         new(c.CategoryID, c.EventID, c.CategoryName, c.DistanceKm, c.MaxParticipants, c.Price);
 

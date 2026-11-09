@@ -77,12 +77,12 @@ public class UsersController : RaceDayControllerBase
         {
             var o = await _db.Organisers.AsNoTracking().FirstOrDefaultAsync(x => x.OrganiserID == CurrentUserId);
             return o == null ? null
-                : new ProfileResponse(o.OrganiserID, Roles.Organiser, o.FullName, o.Email, o.Phone, null);
+                              : new ProfileResponse(o.OrganiserID, Roles.Organiser, o.FullName, o.Email, o.Phone, null, o.ProfilePictureUrl);
         }
 
         var p = await _db.Participants.AsNoTracking().FirstOrDefaultAsync(x => x.ParticipantID == CurrentUserId);
         return p == null ? null
-            : new ProfileResponse(p.ParticipantID, Roles.Participant, p.FullName, p.Email, p.Phone, p.DateOfBirth);
+                      : new ProfileResponse(p.ParticipantID, Roles.Participant, p.FullName, p.Email, p.Phone, p.DateOfBirth, p.ProfilePictureUrl);
     }
 
     private IActionResult AccountMissing()
