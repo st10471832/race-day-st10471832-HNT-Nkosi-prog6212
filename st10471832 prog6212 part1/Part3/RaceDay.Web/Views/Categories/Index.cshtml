@@ -1,0 +1,66 @@
+﻿@model List<RaceDay.Web.Models.CategoryDto>
+@{
+    var ev = (RaceDay.Web.Models.EventDto)ViewBag.Event;
+    ViewData["Title"] = "Categories";
+}
+
+<h2>Categories for @ev.EventName</h2>
+<p class="text-muted">@ev.EventDate.ToString("dd MMM yyyy") · @ev.Location</p>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h5>Add a category</h5>
+        <form asp-action="Add" method="post" class="row g-2">
+            <input type="hidden" name="eventId" value="@ev.EventID" />
+            <div class="col-md-3"><input name="categoryName" class="form-control" placeholder="e.g. 10km" required /></div>
+            <div class="col-md-2"><input name="distanceKm" type="number" step="0.1" class="form-control" placeholder="Distance km" required /></div>
+            <div class="col-md-2"><input name="maxParticipants" type="number" class="form-control" placeholder="Max people" required /></div>
+            <div class="col-md-2"><input name="price" type="number" step="0.01" class="form-control" placeholder="Price" required /></div>
+            <div class="col-md-3"><button type="submit" class="btn btn-primary w-100">Add category</button></div>
+        </form>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No categories yet. Add one above.</div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <table class="table mb-0">
+            <thead>
+                <tr><th>Category</th><th>Distance</th><th>Max</th><th>Price</th><th></th></tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr>
+                        <td>@c.CategoryName</td>
+                        <td>@c.DistanceKm km</td>
+                        <td>@c.MaxParticipants</td>
+                        <td>R @c.Price.ToString("0.00")</td>
+                        <td class="text-end">
+                            <form asp-action="Delete" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@c.CategoryID" />
+                                <input type="hidden" name="eventId" value="@ev.EventID" />
+                                <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<a asp-controller="Organiser" asp-action="Events" class="btn btn-link mt-3">&larr; Back to my events</a>
