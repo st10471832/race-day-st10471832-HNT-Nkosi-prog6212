@@ -1,0 +1,45 @@
+﻿@model List<RaceDay.Web.Models.EventDto>
+@{
+    ViewData["Title"] = "My Events";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>My Events</h2>
+    <a asp-action="CreateEvent" class="btn btn-primary">+ New event</a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">You have not created any events yet.</div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <table class="table mb-0">
+            <thead>
+                <tr><th>Event</th><th>Date</th><th>Location</th><th>Type</th><th>Distance</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var e in Model)
+                {
+                    <tr>
+                        <td>@e.EventName</td>
+                        <td>@e.EventDate.ToString("dd MMM yyyy")</td>
+                        <td>@e.Location</td>
+                        <td>@e.EventType</td>
+                        <td>@e.DistanceKm km</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
