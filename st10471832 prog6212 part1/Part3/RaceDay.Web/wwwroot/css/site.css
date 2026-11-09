@@ -1,31 +1,46 @@
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+:root {
+    --raceday-orange: #ff6b1a;
+    --raceday-dark: #14213d;
 }
 
 body {
-  margin-bottom: 60px;
+    background-color: #f4f6fa;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+.raceday-nav {
+    background: linear-gradient(90deg, var(--raceday-dark), #1f3a68);
+    border-bottom: 3px solid var(--raceday-orange);
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+.btn-primary {
+    background-color: var(--raceday-orange);
+    border-color: var(--raceday-orange);
+}
+
+    .btn-primary:hover, .btn-primary:focus {
+        background-color: #e05a10;
+        border-color: #e05a10;
+    }
+
+a {
+    color: var(--raceday-orange);
+}
+
+h1, h2, h3 {
+    color: var(--raceday-dark);
+}
+
+.card {
+    border: none;
+    border-radius: 12px;
+}
+
+.badge-confirmed {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.badge-pending {
+    background-color: #ffc107;
+    color: #212529;
 }
