@@ -55,6 +55,31 @@
     </div>
 </div>
 
+<div class="row justify-content-center mt-4">
+    <div class="col-md-7">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h5>Banner image</h5>
+
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success">@TempData["Success"]</div>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger">@TempData["Error"]</div>
+                }
+
+                <form asp-action="UploadBanner" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="id" value="@Model.EventID" />
+                    <input type="file" name="file" accept="image/*" class="form-control mb-3" required />
+                    <button type="submit" class="btn btn-primary">Upload banner</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

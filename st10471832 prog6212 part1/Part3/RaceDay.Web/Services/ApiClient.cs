@@ -66,6 +66,38 @@ public class ApiClient
         }
     }
 
+    public async Task<ApiResult<T>> UploadAsync<T>(string url, IFormFile file)
+    {
+        try
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Post, url);
+
+            var cookie = Session.GetString(ApiCookieKey);
+            if (!string.IsNullOrEmpty(cookie))
+                request.Headers.Add("Cookie", cookie);
+
+            using var content = new MultipartFormDataContent();
+            await using var stream = file.OpenReadStream();
+            using var fileContent = new StreamContent(stream);
+            var contentType = string.IsNullOrWhiteSpace(file.ContentType) ? "application/octet-stream" : file.ContentType;
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(contentType);
+            content.Add(fileContent, "file", file.FileName);
+            request.Content = content;
+
+            using var response = await _http.SendAsync(request);
+            CaptureApiCookie(response);
+            return await ReadAsync<T>(response);
+        }
+        catch (HttpRequestException)
+        {
+            return new ApiResult<T>
+            {
+                Success = false,
+                StatusCode = 0,
+                Error = "The RaceDay service is not reachable right now. Please try again shortly."
+            };
+        }
+    }
     private void CaptureApiCookie(HttpResponseMessage response)
     {
         if (!response.Headers.TryGetValues("Set-Cookie", out var values))

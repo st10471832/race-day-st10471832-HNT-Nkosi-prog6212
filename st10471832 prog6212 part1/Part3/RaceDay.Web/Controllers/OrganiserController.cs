@@ -141,6 +141,25 @@ public class OrganiserController : Controller
         return RedirectToAction(nameof(Events));
     }
 
+
+    [HttpPost]
+    public async Task<IActionResult> UploadBanner(int id, IFormFile? file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            TempData["Error"] = "Please choose an image first.";
+            return RedirectToAction(nameof(EditEvent), new { id });
+        }
+
+        var result = await _api.UploadAsync<object>($"api/events/{id}/banner", file);
+
+        if (!result.Success)
+            TempData["Error"] = result.Error;
+        else
+            TempData["Success"] = "Banner image uploaded.";
+
+        return RedirectToAction(nameof(EditEvent), new { id });
+    }
     private static object BuildBody(EventFormViewModel model) => new
     {
         eventName = model.EventName,

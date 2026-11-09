@@ -92,6 +92,24 @@ public class ParticipantController : Controller
         TempData["Success"] = "Profile updated.";
         return RedirectToAction(nameof(Profile));
     }
+    [HttpPost]
+    public async Task<IActionResult> UploadPicture(IFormFile? file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            TempData["Error"] = "Please choose an image first.";
+            return RedirectToAction(nameof(Profile));
+        }
+
+        var result = await _api.UploadAsync<object>("api/users/me/picture", file);
+
+        if (!result.Success)
+            TempData["Error"] = result.Error;
+        else
+            TempData["Success"] = "Profile picture updated.";
+
+        return RedirectToAction(nameof(Profile));
+    }
     public async Task<IActionResult> MyResults()
     {
         var result = await _api.GetAsync<List<ResultDto>>("api/participants/me/results");
